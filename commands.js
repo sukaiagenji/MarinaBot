@@ -23,7 +23,8 @@ try {
 }
 
 commands = {
-/*	"gif": {
+	"gif": {
+		disabled: true,
 		usage: "<image tags>",
         description: "returns a random gif matching the tags passed",
 		process: function(bot, msg, suffix) {
@@ -37,7 +38,7 @@ commands = {
 			}
 		    });
 		}
-	}, */
+	},
     "ping": {
         description: "responds pong, useful for checking if bot is alive",
         process: function(bot, msg, suffix) {
@@ -84,13 +85,14 @@ commands = {
 		adminlvl: 4,
         process: function(bot,msg){ bot.setStatusOnline();}
     },
-/*    "youtube": {
+    "youtube": {
+		disabled: true,
         usage: "<video tags>",
         description: "gets youtube video matching tags",
         process: function(bot,msg,suffix){
             youtube_plugin.respond(suffix,msg.channel,bot);
         }
-    }, */
+    },
     "say": {
         usage: "<message>",
         description: "bot says message",
@@ -103,12 +105,14 @@ commands = {
 		adminlvl: 2,
         process: function(bot,msg,suffix){ bot.sendMessage(msg.channel,suffix,true);}
     },
-/*    "image": {
+    "image": {
+		disabled: true,
         usage: "<image tags>",
         description: "gets image matching tags from google",
         process: function(bot,msg,suffix){ google_image_plugin.respond(suffix,msg.channel,bot);}
-    }, */
-/*    "pullanddeploy": {
+    },
+    "pullanddeploy": {
+		disabled: true,
         description: "bot will perform a git pull master and restart with the new code",
         process: function(bot,msg,suffix) {
             bot.sendMessage(msg.channel,"fetching updates...",function(error,sentMsg){
@@ -144,8 +148,9 @@ commands = {
                 });
             });
         }
-    }, */
-/*    "meme": {
+    },
+    "meme": {
+		disabled: true,
         usage: 'meme "top text" "bottom text"',
         process: function(bot,msg,suffix) {
             var tags = msg.content.split('"');
@@ -158,8 +163,9 @@ commands = {
                 bot.sendMessage(msg.channel,image);
             });
         }
-    }, */
-/*    "memehelp": { //TODO: this should be handled by !help
+    },
+    "memehelp": { //TODO: this should be handled by !help
+		disabled: true,
         description: "returns available memes for !meme",
         process: function(bot,msg) {
             var str = "Currently available memes:\n"
@@ -168,8 +174,9 @@ commands = {
             }
             bot.sendMessage(msg.channel,str);
         }
-    }, */
-/*    "version": {
+    },
+    "version": {
+		disabled: true,
         description: "returns the git commit this bot is running",
         process: function(bot,msg,suffix) {
             var commit = require('child_process').spawn('git', ['log','-n','1']);
@@ -182,14 +189,15 @@ commands = {
                 }
             });
         }
-    }, */
+    },
     "log": {
         usage: "<log message>",
         description: "logs message to bot console",
 		adminlvl: 4,
         process: function(bot,msg,suffix){console.log(msg.content);}
     },
-/*    "wiki": {
+    "wiki": {
+		disabled: true,
         usage: "<search terms>",
         description: "returns the summary of the first matching search result from Wikipedia",
         process: function(bot,msg,suffix) {
@@ -216,7 +224,7 @@ commands = {
                 bot.sendMessage(msg.channel,err);
             });
         }
-    }, */
+    },
     "join-server": {
         usage: "<invite>",
         description: "joins the server it's invited to",
@@ -272,7 +280,8 @@ commands = {
             });
         }
     },
-/*    "stock": {
+    "stock": {
+		disabled: true,
         usage: "<stock to fetch>",
         process: function(bot,msg,suffix) {
             var yahooFinance = require('yahoo-finance');
@@ -289,8 +298,9 @@ commands = {
                 }  
             });
         }
-    }, */
-/*	"wolfram": {
+    },
+	"wolfram": {
+		disabled: true,
 		usage: "<search terms>",
         description: "gives results from wolframalpha using search terms",
         process: function(bot,msg,suffix){
@@ -299,8 +309,9 @@ commands = {
 			}
             wolfram_plugin.respond(suffix,msg.channel,bot);
         }
-	}, */
-/*    "rss": {
+	},
+    "rss": {
+		disabled: true,
         description: "lists available rss feeds",
         process: function(bot,msg,suffix) {
             //var args = suffix.split(" ");
@@ -313,8 +324,9 @@ commands = {
                 }
             });
         }
-    }, */
-/*    "reddit": {
+    },
+    "reddit": {
+		disabled: true,
         usage: "[subreddit]",
         description: "Returns the top post on reddit. Can optionally pass a subreddit to get the top psot there instead",
         process: function(bot,msg,suffix) {
@@ -324,7 +336,7 @@ commands = {
             }
             rssfeed(bot,msg,"https://www.reddit.com"+path,1,false);
         }
-    }, */
+    },
 	"alias": {
 		usage: "<name> <actual command>",
 		description: "Creates command aliases. Useful for making simple commands on the fly",

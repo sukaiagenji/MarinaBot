@@ -83,11 +83,11 @@ bot.on("ready", function () {
 	console.log("Ready to begin! Serving in " + bot.channels.length + " channels");
 
 	// Send a message to the #general channel of each server, letting everyone know we're online.
-	for (var i = 0; i < bot.channels.length; i++) {
+/*	for (var i = 0; i < bot.channels.length; i++) {
 		if (bot.channels[i].name == "general") {
 			bot.sendMessage(bot.channels[i].id, settings.loginMessage.toString());
 		}
-	}
+	} */
 	
 	// Set game I'm playing to....
 	try {
@@ -100,7 +100,6 @@ bot.on("ready", function () {
 		setInterval(fn60sec, 60000);
 		fn60sec();
 	}
-
 });
 
 // And when the bot goes offline for any reason.
@@ -178,7 +177,7 @@ bot.on("message", function (msg) {
         if (cmdTxt === "help") {
             //help is special since it iterates over the other commands
             for (var cmd in commands) {
-				if (!commands[cmd].adminlvl || commands[cmd].adminlvl <= admins[msg.author.username]) {
+				if ((!commands[cmd].adminlvl || commands[cmd].adminlvl <= admins[msg.author.username]) && commands[cmd].disabled != true) {
 					var info = "!" + cmd;
 					var usage = commands[cmd].usage;
 					if (usage) {
@@ -191,12 +190,12 @@ bot.on("message", function (msg) {
 					bot.sendMessage(msg.channel,info);
 				}
             }
-        } else if ((cmd && (admins[msg.author.username] >= commands[cmdTxt].adminlvl || !commands[cmdTxt].adminlvl)) || pingpong[cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'')]) {
+        } else if (((cmd && (admins[msg.author.username] >= cmd.adminlvl || !cmd.adminlvl)) || pingpong[cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'')] && cmd.disabled != true)) {
 			if (!commands[cmdTxt]) {
 				var commandName = cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'');
 				var commandTxt = pingpong[commandName];
 				bot.sendMessage(msg.channel, commandTxt);
-			} else {
+			} else if (cmd.disabled != true) {
 				cmd.process(bot,msg,suffix);
 			}
 		} else {
@@ -274,21 +273,21 @@ bot.on("presence", function(data) {
 bot.login(AuthDetails.email, AuthDetails.password);
 
 // Extra functions like PSO2es EQ alert
-var hrnow, str, oldstr, hridx, hrstr, eqidx, eqstr, transEQ;
+var hrnow, hridx, hrstr, str, oldstr, eqidx, eqstr, transEQ;
 
 function fn60sec() {
 	getNotice();
-	if (!oldstr) {
+	if (oldstr == undefined || str == undefined) {
 		oldstr = str;
-	} else if (oldstr !== str) {
+	} else if (oldstr != str) {
 		for (var i = 0; i < bot.channels.length; i++) {
 			if (bot.channels[i].name == "general") {
-				//bot.sendMessage(bot.channels[i].id, "@everyone Incoming EQ Report from PSO2es: " + transEQ + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
-				console.log("Derp.");
+				bot.sendMessage(bot.channels[i].id, "@everyone Incoming EQ Report from PSO2es: " + transEQ + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
 			}
 		}
 		oldstr = str;
 	}
+	str = ''
 }
 
 function isInteger(x) {

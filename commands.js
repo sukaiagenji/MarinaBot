@@ -3,23 +3,19 @@ var aliases, admins, pingpong;
 try {
 	aliases = require("./alias.json");
 } catch(e) {
-	//No aliases defined
 	aliases = {};
-	console.log("Aliases failed to load in command.js " + e);
 }
 
 try {
 	admins = require("./admins.json");
 } catch(e) {
 	admins = {};
-	console.log("Admin file failed to load in command.js " + e);
 }
 
 try {
 	pingpong = require("./pingpong.json");
 } catch(e) {
 	pingpong = {};
-	console.log("Pingpong commands not found in command.js " + e);
 }
 
 commands = {

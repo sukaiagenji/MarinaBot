@@ -7,14 +7,14 @@ There are a few steps before you start using Marina for the first time. First, y
 #Setting up Marina
 There are 7 settings you'll need to edit in settings.json, as well as auth.json. auth.json is self-explanatory. But the others.....
 
-`discordjsLocation`	Simply the path to your discord.js installation. Hint: You're actually aiming for a folder.
-`loginMessage`		Whatever you want your bot to say when it logs in, so that you know she's online!
-`gamePlaying`		If you want your bot to be "playing a game", simply enter a number. See discord.js/ref/gameMap.json for valid games.
-`PSO2Bot`			Marina was set to be a PSO2 EQ Alert Bot, so I kept this for reference.
-`aiEnabled`			Marina can do AIML AI through PandoraBots!!! If you set this to true, she *must* have a botid set.
-`botid`				Simply the bot ID of the PandoraBot that you'll be using. I'll set instructions later, or just leave it.
-`aiRandomReply`		If you want Marina to randomly reply to guests, set this to true. She'll respond in any room!!!
-`aiIsolated`		If you don't want everyone spamming your chat with @s to your AI bot, make a text channel, and put the name here to isolate the AI @s.
+`discordjsLocation`<br>Simply the path to your discord.js installation. Hint: You're actually aiming for a folder.<br>
+`loginMessage`<br>Whatever you want your bot to say when it logs in, so that you know she's online!<br>
+`gamePlaying`<br>If you want your bot to be "playing a game", simply enter a number. See discord.js/ref/gameMap.json for valid games.<br>
+`PSO2Bot`<br>Marina was set to be a PSO2 EQ Alert Bot, so I kept this for reference.<br>
+`aiEnabled`<br>Marina can do AIML AI through PandoraBots!!! If you set this to true, she *must* have a botid set.<br>
+`botid`<br>Simply the bot ID of the PandoraBot that you'll be using. I'll set instructions later, or just leave it.<br>
+`aiRandomReply`<br>If you want Marina to randomly reply to guests, set this to true. She'll respond in any room!!!<br>
+`aiIsolated`<br>If you don't want everyone spamming your chat with @s to your AI bot, make a text channel, and put the name here to isolate the AI @s.
 
 #Usage
 Be sure MarinaBot is already on your server (AKA joined) before anything else. Once she's joined, make sure to edit the auth.json and settings.json files to your liking, then simply run `node MarinaBot.js`. If everything has been set up correctly, you'll get a message with what files you're missing, and how many channels MarinaBot is serving.

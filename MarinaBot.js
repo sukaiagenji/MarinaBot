@@ -190,7 +190,11 @@ bot.on("message", function (msg) {
 					bot.sendMessage(msg.channel,info);
 				}
             }
-        } else if (((cmd && (admins[msg.author.username] >= cmd.adminlvl || !cmd.adminlvl)) || pingpong[cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'')] && cmd.disabled != true)) {
+			for (var cmd in pingpong) {
+				var info = "!" + cmd;
+				bot.sendMessage(msg.channel, info + "\n\tPersonalized command made by the admins. Try it out!")
+			}
+        } else if (((cmd && (admins[msg.author.username] >= cmd.adminlvl || !cmd.adminlvl) && (cmd.disabled != true || !cmd.disabled)) || pingpong[cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'')])) {
 			if (!commands[cmdTxt]) {
 				var commandName = cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'');
 				var commandTxt = pingpong[commandName];

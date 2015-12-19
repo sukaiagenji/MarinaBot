@@ -119,6 +119,7 @@ bot.on("message", function (msg) {
 	
 	// And do the random AI response. Sometimes.....
 	if (randomReply == 1 && msg.author.id != bot.user.id && !msg.isMentioned(bot.user) && settings.aiEnabled == true && settings.aiRandomReply == true) {
+		// If the bot is allowed to Random Reply, no need to isolate. That's just silly.
 		console.log("From " + msg.sender.username + ": " + msg.content);
 		var querystring = require('querystring');
 		var http = require('http');
@@ -210,6 +211,15 @@ bot.on("message", function (msg) {
         if (msg.author.id != bot.user.id && msg.isMentioned(bot.user) && !msg.content.split(" ")[1]) {
                 bot.sendMessage(msg.channel,msg.author + ", you called?");
         } else if (msg.author.id != bot.user.id && msg.isMentioned(bot.user) && msg.content.split(" ")[1] && settings.aiEnabled == true) {
+			// But we'll isolate here.
+			var roomID;
+			if (settings.aiIsolated) {
+				for (var i = 0; i < bot.channels.length; i++) {
+					if (bot.channels[i].name == settings.aiIsolated) {
+						roomID = "<#" + bot.channels[i].id + ">"
+					}
+				}
+			}
 			console.log("From " + msg.sender.username + ": " + msg.content.substr(msg.content.indexOf(">") + 2));
 			var querystring = require('querystring');
 			var http = require('http');
@@ -237,8 +247,14 @@ bot.on("message", function (msg) {
 				var chunkSplit1 = chunk.indexOf('<that>');
 				var chunkSplit2 = chunk.indexOf('</that>');
 				var responce = chunk.substring((chunkSplit1 + 6), chunkSplit2);
-				bot.reply(msg, responce);
-				console.log("Reply: " + responce);
+				if (settings.aiIsolated) {
+					if (msg.channel == roomID) {
+						bot.reply(msg, responce);
+						console.log("Reply: " + responce);
+					} else {
+						console.log("Message not sent in AI chat room. Ignored.");
+					}
+				}
 				});
 			});
 
@@ -262,12 +278,13 @@ var hrnow, str, oldstr, hridx, hrstr, eqidx, eqstr, transEQ;
 
 function fn60sec() {
 	getNotice();
-	if (oldstr == undefined) {
+	if (!oldstr) {
 		oldstr = str;
 	} else if (oldstr !== str) {
 		for (var i = 0; i < bot.channels.length; i++) {
 			if (bot.channels[i].name == "general") {
-				bot.sendMessage(bot.channels[i].id, "@everyone Incoming EQ Report from PSO2es: " + transEQ + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
+				//bot.sendMessage(bot.channels[i].id, "@everyone Incoming EQ Report from PSO2es: " + transEQ + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
+				console.log("Derp.");
 			}
 		}
 		oldstr = str;

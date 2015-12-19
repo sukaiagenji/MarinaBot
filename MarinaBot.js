@@ -83,11 +83,11 @@ bot.on("ready", function () {
 	console.log("Ready to begin! Serving in " + bot.channels.length + " channels");
 
 	// Send a message to the #general channel of each server, letting everyone know we're online.
-/*	for (var i = 0; i < bot.channels.length; i++) {
+	for (var i = 0; i < bot.channels.length; i++) {
 		if (bot.channels[i].name == "general") {
 			bot.sendMessage(bot.channels[i].id, settings.loginMessage.toString());
 		}
-	} */
+	}
 	
 	// Set game I'm playing to....
 	try {

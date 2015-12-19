@@ -1,11 +1,11 @@
-#First Things First
-Yes, I know there's nothing here. I haven't uploaded everything yet. As soon as I can, I will be uploading everything.
-
 # MarinaBot
 MarinaBot is a Discord bot that uses discord.js. She is licensed under GPL for any and all usage, just be sure to include me and other contributors in any edits made, as I have.
 
 #Installation
 As of now, you need to download the zip file from here, and install node.js and discord.js separately. I hope to fix and automate everything in the near future.
+
+#Setting up Marina
+There are 7 settings you'll need to edit in settings.json, as well as auth.json. auth.json is self-explanatory. But the others.....
 
 #Usage
 Be sure MarinaBot is already on your server (AKA joined) before anything else. Edit the auth.json and settings.json files to your liking, then simply run "node MarinaBot.js". If everything has been set up correctly, you'll get a message with how many channels MarinaBot is serving.

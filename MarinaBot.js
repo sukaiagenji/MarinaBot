@@ -17,7 +17,7 @@ var commands, settings, aliases, jsonEQ;
 try {
 	var commands = require("./commands.js");
 } catch(e) {
-	console.log("Could not load commands file (required). Terminating. " + e); */
+	console.log("Could not load commands file (required). Terminating. " + e);
 }
 
 try {
@@ -37,7 +37,7 @@ try {
 
 // Obviously need discord.js to run...
 try {
-	var Discord = require(settings.discordjsLocation.toString());
+	var Discord = require(settings.discordjsLocation);
 } catch(e) {
 	var Discord = require("../");
 	console.log("Discord.JS not found. " + e);
@@ -68,8 +68,12 @@ bot.on("ready", function () {
 	// Let's just send this to the console.
 	console.log("Ready to begin! Serving in " + bot.channels.length + " channels");
 
-	// Send a message to the #general channel, letting everyone know we're online.
-	bot.sendMessage(Discord.Server.defaultChannel, settings.loginMessage.toString());
+	// Send a message to the #general channel of each server, letting everyone know we're online.
+	for (var i = 0; i < bot.channels.length; i++) {
+		if (bot.channels[i].name == "general") {
+			bot.sendMessage(bot.channels[i].id, settings.loginMessage.toString());
+		}
+	}
 	// Set game I'm playing to....
 	try {
 		bot.setPlayingGame(settings.gamePlaying);
@@ -181,10 +185,9 @@ bot.on("message", function (msg) {
         if (msg.author.id == bot.user.id) {
             return;
         }
-        console.log(msg.content);
         if (msg.author.id != bot.user.id && msg.isMentioned(bot.user) && !msg.content.split(" ")[1]) {
                 bot.sendMessage(msg.channel,msg.author + ", you called?");
-        } else if (msg.author.id != bot.user.id && msg.isMentioned(bot.user) && msg.content.split(" ")[1] && aiEnabled == true) {
+        } else if (msg.author.id != bot.user.id && msg.isMentioned(bot.user) && msg.content.split(" ")[1] && settings.aiEnabled == true) {
 			console.log("From " + msg.sender.username + ": " + msg.content.substr(msg.content.indexOf(">") + 2));
 			var querystring = require('querystring');
 			var http = require('http');

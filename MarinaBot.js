@@ -12,7 +12,7 @@ Special thanks to Discord and its creators Hammer & Chisel, inc.,
 */
 
 // Resource files for usage by MarinaBot, such as commands and PSO2es EQ translation
-var commands, settings, aliases, jsonEQ;
+var commands, settings, aliases, jsonEQ, admins, pingpong;
 
 try {
 	var commands = require("./commands.js");
@@ -41,6 +41,20 @@ try {
 } catch(e) {
 	var Discord = require("../");
 	console.log("Discord.JS not found. " + e);
+}
+
+try {
+	admins = require("./admins.json");
+} catch(e) {
+	admins = {};
+	console.log("Admin file failed to load. " + e);
+}
+
+try {
+	pingpong = require("./pingpong.json");
+} catch(e) {
+	pingpong = {};
+	console.log("Pingpong commands not found. " + e);
 }
 
 // Let's add in EQ translation, IF we're doing EQ notifications.
@@ -74,6 +88,7 @@ bot.on("ready", function () {
 			bot.sendMessage(bot.channels[i].id, settings.loginMessage.toString());
 		}
 	}
+	
 	// Set game I'm playing to....
 	try {
 		bot.setPlayingGame(settings.gamePlaying);
@@ -174,8 +189,12 @@ bot.on("message", function (msg) {
                 }
                 bot.sendMessage(msg.channel,info);
             }
-        } else if (cmd) {
-            cmd.process(bot,msg,suffix);
+        } else if ((cmd && (admins[msg.author.id] > commands[cmd].adminlvl || !commands[cmd].adminlvl)) || pingpong[cmdTxt]) {
+			if (!commands[cmdTxt]) {
+				bot.sendMessage(msg.channel, pingpong[cmdTxt]);
+			} else {
+				cmd.process(bot,msg,suffix);
+			}
 		} else {
 			bot.sendMessage(msg.channel, "Invalid command " + cmdTxt);
 		}

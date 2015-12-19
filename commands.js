@@ -37,22 +37,27 @@ module.exports = {
     },
     "servers": {
         description: "lists servers bot is connected to",
+		adminlvl: 4,
         process: function(bot,msg){bot.sendMessage(msg.channel,bot.servers);}
     },
     "channels": {
         description: "lists channels bot is connected to",
+		adminlvl: 4,
         process: function(bot,msg) { bot.sendMessage(msg.channel,bot.channels);}
     },
     "myid": {
         description: "returns the user id of the sender",
+		adminlvl: 1
         process: function(bot,msg){bot.sendMessage(msg.channel,msg.author.id);}
     },
     "idle": {
         description: "sets bot status to idle",
+		adminlvl: 4,
         process: function(bot,msg){ bot.setStatusIdle();}
     },
     "online": {
         description: "sets bot status to online",
+		adminlvl: 4,
         process: function(bot,msg){ bot.setStatusOnline();}
     },
 /*    "youtube": {
@@ -65,11 +70,13 @@ module.exports = {
     "say": {
         usage: "<message>",
         description: "bot says message",
+		adminlvl: 1
         process: function(bot,msg,suffix){ bot.sendMessage(msg.channel,suffix);}
     },
 	"announce": {
         usage: "<message>",
         description: "bot says message with text to speech",
+		adminlvl: 2
         process: function(bot,msg,suffix){ bot.sendMessage(msg.channel,suffix,true);}
     },
 /*    "image": {
@@ -155,6 +162,7 @@ module.exports = {
     "log": {
         usage: "<log message>",
         description: "logs message to bot console",
+		adminlvl: 4,
         process: function(bot,msg,suffix){console.log(msg.content);}
     },
 /*    "wiki": {
@@ -188,6 +196,7 @@ module.exports = {
     "join-server": {
         usage: "<invite>",
         description: "joins the server it's invited to",
+		adminlvl: 4,
         process: function(bot,msg,suffix) {
             console.log(bot.joinServer(suffix,function(error,server) {
                 console.log("callback: " + arguments);
@@ -203,6 +212,7 @@ module.exports = {
     "create": {
         usage: "<text|voice> <channel name>",
         description: "creates a channel with the given type and name.",
+		adminlvl: 3,
         process: function(bot,msg,suffix) {
             var args = suffix.split(" ");
             var type = args.shift();
@@ -222,6 +232,7 @@ module.exports = {
     "delete": {
         usage: "<channel name>",
         description: "deletes the specified channel",
+		adminlvl: 3,
         process: function(bot,msg,suffix) {
             var channel = bot.getChannel("name",suffix);
             bot.sendMessage(msg.channel.server.defaultChannel, "deleting channel " + suffix + " at " +msg.author + "'s request");
@@ -293,6 +304,7 @@ module.exports = {
 	"alias": {
 		usage: "<name> <actual command>",
 		description: "Creates command aliases. Useful for making simple commands on the fly",
+		adminlvl: 3,
 		process: function(bot,msg,suffix) {
 			var args = suffix.split(" ");
 			var name = args.shift();
@@ -306,6 +318,59 @@ module.exports = {
 				//now save the new alias
 				require("fs").writeFile("./alias.json",JSON.stringify(aliases,null,2), null);
 				bot.sendMessage(msg.channel,"created alias " + name);
+			}
+		}
+	}
+	"savecmd": {
+		usage: "<name> <actual command>",
+		description: "Creates simple 'ping pong' commands. Useful for keyword triggers",
+		adminlvl: 3,
+		process: function(bot,msg,suffix) {
+			var args = suffix.split(" ");
+			var name = args.shift();
+			if(!name){
+				bot.sendMessage(msg.channel,"!savecmd " + this.usage + "\n" + this.description);
+			} else if(commands[name] || name === "help"){
+				bot.sendMessage(msg.channel,"overwriting commands with other commands is not allowed!");
+			} else {
+				var command = args.shift();
+				pingpong[name] = [command, args.join(" ")];
+				//now save the new pingpong command
+				require("fs").writeFile("./pingpong.json",JSON.stringify(pingpong,null,2), null);
+				bot.sendMessage(msg.channel,"created command " + name);
+			}
+		}
+	}
+	"addlevel": {
+		usage: "<username>",
+		description: "Adds a level to the user's admin level. Needed for some commands."
+		adminlvl: 3,
+		process: function(bot,msg,suffix) {
+			var myAdminLvl = admins[msg.author.id];
+			var otherAdminLvl = admins[suffix];
+			var otherAdmin, otherID;
+			if (!otherAdminLvl) {
+				otherAdminLvl = 0
+			}
+			if(suffix.startsWith('<@')){ 
+ 				suffix = suffix.substr(2,user.length-3); 
+ 			} 
+			if (myAdminLvl > otherAdminLvl + 1) {
+				for (var i = 0; i < bot.users.length; i++) {
+					if (bot.users[i].username == suffix || bot.users[i].id == suffix) {
+						otherAdmin = bot.users[i].username;
+						otherID = bot.users[i].id;
+						i = 9999;
+					}
+				}
+			}
+			if (otherAdmin && otherID) {
+				var command = args.shift();
+				admins[otherAdmin] = otherAdminLvl + 1;
+				//now save the new admin file
+				require("fs").writeFile("./admins.json",JSON.stringify(pingpong,null,2), null);
+				bot.sendMessage(msg.channel,"added admin " + otherAdmin + ": " + admins[otherAdmin]);
+
 			}
 		}
 	}

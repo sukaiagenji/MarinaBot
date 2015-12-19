@@ -20,6 +20,10 @@ There are 7 settings you'll need to edit in settings.json, as well as auth.json.
 Be sure MarinaBot is already on your server (AKA joined) before anything else. Once she's joined, make sure to edit the auth.json and settings.json files to your liking, then simply run `node MarinaBot.js`. If everything has been set up correctly, you'll get a message with what files you're missing, and how many channels MarinaBot is serving.
 
 #Advanced
+Check out the commands.js file for things like adminlvl and command disabling. Simply.....<br>
+adminlvl can be any number, from 1 to 100. Basically, the higher a person's adminlvl, the more they can do. I only needed 5 levels, so 4 was my highest number.<br>
+Certain commands have a `disabled` variable. Setting a command's `disabled` to true removes the command from usage. Best combined with plugin removal, or if you don't need certain commands, like `!checkeq`.
+
 TODO: Explain AI setup through PandoraBots.
 
 #PSO2 EQ Alerts Status

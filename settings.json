@@ -1,0 +1,9 @@
+{
+		"discordjsLocation" : "\/directory\/to\/discord.js",	// Directory to your Discord.js installation. Yes, the \ is required before /
+		"loginMessage" : "Hello, everyone!",					// Your bot's login message.
+		"gamePlaying" : "355",									// What game you want your bot to play. see discord.js/ref/gameMap.json
+		"PSO2Bot" : "true",										// Whether you want your bot to send PSO2 EQ Alerts.
+		"aiEnabled" : "false",									// If AI is enabled for your bot.
+		"botid" : "9437b936fe3787aa",							// Your PandoraBots Bot ID. This is Marina's.
+		"aiRandomReply" : "false"								// Do you want your bot to reply randomly to people?
+}

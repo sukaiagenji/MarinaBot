@@ -15,7 +15,7 @@ Special thanks to Discord and its creators Hammer & Chisel, inc.,
 var commands, settings, aliases, jsonEQ, admins, pingpong;
 
 try {
-	var commands = require("./commands.js");
+	commands = require("./commands.js");
 } catch(e) {
 	console.log("Could not load commands file (required). Terminating. " + e);
 }
@@ -60,7 +60,7 @@ try {
 // Let's add in EQ translation, IF we're doing EQ notifications.
 if (settings.PSO2Bot == true) {
 	try {
-		var jsonEQ = require("./eqJP.json");
+		jsonEQ = require("./eqJP.json");
 	} catch(e) {
 		console.log("Couldn't load EQ Translation file, needed for PSO2 EQ Bot.\n\t Try setting PSO2Bot to false in the settings file, or download the eqJP.json file.\n\t " + e)
 	}
@@ -97,9 +97,8 @@ bot.on("ready", function () {
 	}
 	// Am I a PSO2 bot, or not?
 	if (settings.PSO2Bot == true) {
-/*		setInterval(fn60sec, 60000);
-		fn60sec(); */
-		console.log("PSO2 EQ Alerts are currently disabled.")
+		setInterval(fn60sec, 60000);
+		fn60sec();
 	}
 
 });
@@ -178,20 +177,24 @@ bot.on("message", function (msg) {
         if (cmdTxt === "help") {
             //help is special since it iterates over the other commands
             for (var cmd in commands) {
-                var info = "!" + cmd;
-                var usage = commands[cmd].usage;
-                if (usage) {
-                    info += " " + usage;
-                }
-                var description = commands[cmd].description;
-                if(description){
-                    info += "\n\t" + description;
-                }
-                bot.sendMessage(msg.channel,info);
+				if (!commands[cmd].adminlvl || commands[cmd].adminlvl <= admins[msg.author.username]) {
+					var info = "!" + cmd;
+					var usage = commands[cmd].usage;
+					if (usage) {
+						info += " " + usage;
+					}
+					var description = commands[cmd].description;
+					if(description){
+						info += "\n\t" + description;
+					}
+					bot.sendMessage(msg.channel,info);
+				}
             }
-        } else if ((cmd && (admins[msg.author.id] > commands[cmd].adminlvl || !commands[cmd].adminlvl)) || pingpong[cmdTxt]) {
+        } else if ((cmd && (admins[msg.author.username] >= commands[cmdTxt].adminlvl || !commands[cmdTxt].adminlvl)) || pingpong[cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'')]) {
 			if (!commands[cmdTxt]) {
-				bot.sendMessage(msg.channel, pingpong[cmdTxt]);
+				var commandName = cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'');
+				var commandTxt = pingpong[commandName];
+				bot.sendMessage(msg.channel, commandTxt);
 			} else {
 				cmd.process(bot,msg,suffix);
 			}
@@ -262,7 +265,10 @@ function fn60sec() {
 	if (oldstr == undefined) {
 		oldstr = str;
 	} else if (oldstr !== str) {
-		bot.sendMessage(Discord.Server.defaultChannel, "@everyone Incoming EQ Report from PSO2es: " + transEQ + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
+		for (var i = 0; i < bot.channels.length; i++) {
+		if (bot.channels[i].name == "general") {
+			bot.sendMessage(bot.channels[i].id, "@everyone Incoming EQ Report from PSO2es: " + transEQ + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
+		}
 		oldstr = str;
 	}
 }
@@ -272,6 +278,7 @@ function isInteger(x) {
 }
 
 function getNotice() {
+	var http = require('http');
 	var options = {
 		host: 'acf.me.uk',
 		path: '/Public/PSO2EQ/pso2eq.txt'

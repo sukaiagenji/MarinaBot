@@ -266,8 +266,9 @@ function fn60sec() {
 		oldstr = str;
 	} else if (oldstr !== str) {
 		for (var i = 0; i < bot.channels.length; i++) {
-		if (bot.channels[i].name == "general") {
-			bot.sendMessage(bot.channels[i].id, "@everyone Incoming EQ Report from PSO2es: " + transEQ + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
+			if (bot.channels[i].name == "general") {
+				bot.sendMessage(bot.channels[i].id, "@everyone Incoming EQ Report from PSO2es: " + transEQ + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
+			}
 		}
 		oldstr = str;
 	}

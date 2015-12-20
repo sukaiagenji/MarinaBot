@@ -2,7 +2,6 @@
 		"discordjsLocation" : "/path/to/discord.js",
 		"loginMessage" : "Hello, everyone!",
 		"gamePlaying" : 355,
-		"PSO2Bot" : true,
 		"aiEnabled" : false,
 		"botid" : "9437b936fe3787aa",
 		"aiRandomReply" : false,

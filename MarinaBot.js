@@ -12,7 +12,7 @@ Special thanks to Discord and its creators Hammer & Chisel, inc.,
 */
 
 // Resource files for usage by MarinaBot, such as commands and PSO2es EQ translation
-var commands, settings, aliases, jsonEQ, admins, pingpong;
+var commands, settings, aliases, admins, pingpong;
 
 try {
 	commands = require("./commands.js");
@@ -57,20 +57,28 @@ try {
 	console.log("Pingpong commands not found. " + e);
 }
 
-// Let's add in EQ translation, IF we're doing EQ notifications.
-if (settings.PSO2Bot == true) {
-	try {
-		jsonEQ = require("./eqJP.json");
-	} catch(e) {
-		console.log("Couldn't load EQ Translation file, needed for PSO2 EQ Bot.\n\t Try setting PSO2Bot to false in the settings file, or download the eqJP.json file.\n\t " + e)
-	}
-}
-
 // And finally, the login file.
 try {
 	var AuthDetails = require("./auth.json");
 } catch(e) {
 	console.log("Couldn't find auth.json file, needed for sign-in. " + e);
+}
+
+// Recently added plugins directory!!!
+try {
+	require('fs').readdirSync(__dirname + '/plugins').forEach(function(file) {
+	  if (file.match(/\.js$/) !== null && file !== 'index.js') {
+		var name = file.replace('.js', '');
+		exports[name] = require('./plugins/' + file);
+		// If this plugin has a function named fn60sec, we'll run it every minute.
+		if (exports[name].fn60sec) {
+			setInterval(exports[name].fn60sec, 60000);
+			exports[name].fn60sec();
+		}
+	  }
+	});
+} catch(e) {
+	console.log("No plugins found. " + e);
 }
 
 
@@ -83,9 +91,11 @@ bot.on("ready", function () {
 	console.log("Ready to begin! Serving in " + bot.channels.length + " channels");
 
 	// Send a message to the #general channel of each server, letting everyone know we're online.
-	for (var i = 0; i < bot.channels.length; i++) {
-		if (bot.channels[i].name == "general") {
-			bot.sendMessage(bot.channels[i].id, settings.loginMessage.toString());
+	if (settings.loginMessage) {
+		for (var i = 0; i < bot.channels.length; i++) {
+			if (bot.channels[i].name == "general") {
+				bot.sendMessage(bot.channels[i].id, settings.loginMessage.toString());
+			}
 		}
 	}
 	
@@ -94,11 +104,6 @@ bot.on("ready", function () {
 		bot.setPlayingGame(settings.gamePlaying);
 	} catch(e) { // Or not.....
 		return;
-	}
-	// Am I a PSO2 bot, or not?
-	if (settings.PSO2Bot == true) {
-		setInterval(fn60sec, 60000);
-		fn60sec();
 	}
 });
 
@@ -117,7 +122,8 @@ bot.on("message", function (msg) {
 	var randomReply = (Math.floor(Math.random() * 10) + 1);
 	
 	// And do the random AI response. Sometimes.....
-	if (randomReply == 1 && msg.author.id != bot.user.id && !msg.isMentioned(bot.user) && settings.aiEnabled == true && settings.aiRandomReply == true) {
+	if (randomReply == 1 && msg.author.id != bot.user.id && !msg.isMentioned(bot.user) && settings.aiEnabled == true
+	&& settings.aiRandomReply == true) {
 		// If the bot is allowed to Random Reply, no need to isolate. That's just silly.
 		console.log("From " + msg.sender.username + ": " + msg.content);
 		var querystring = require('querystring');
@@ -194,7 +200,8 @@ bot.on("message", function (msg) {
 				var info = "!" + cmd;
 				bot.sendMessage(msg.channel, info + "\n\tPersonalized command made by the admins. Try it out!")
 			}
-        } else if (((cmd && (admins[msg.author.username] >= cmd.adminlvl || !cmd.adminlvl) && (cmd.disabled != true || !cmd.disabled)) || pingpong[cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'')])) {
+        } else if ((cmd && (admins[msg.author.username] >= cmd.adminlvl || !cmd.adminlvl) && (cmd.disabled != true || !cmd.disabled))
+		|| pingpong[cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'')]) {
 			if (!commands[cmdTxt]) {
 				var commandName = cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'');
 				var commandTxt = pingpong[commandName];
@@ -276,70 +283,8 @@ bot.on("presence", function(data) {
 // Needed for login information.
 bot.login(AuthDetails.email, AuthDetails.password);
 
-// Extra functions like PSO2es EQ alert
-var hrnow, hridx, hrstr, str, oldstr, eqidx, eqstr, transEQ;
-
-function fn60sec() {
-	getNotice();
-	if (oldstr == undefined || str == undefined) {
-		oldstr = str;
-	} else if (oldstr != str) {
-		for (var i = 0; i < bot.channels.length; i++) {
-			if (bot.channels[i].name == "general") {
-				bot.sendMessage(bot.channels[i].id, "@everyone Incoming EQ Report from PSO2es: " + transEQ + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
-			}
-		}
-		oldstr = str;
-	}
-	str = ''
-}
-
 function isInteger(x) {
 	return Math.round(x) === x;
-}
-
-function getNotice() {
-	var http = require('http');
-	var options = {
-		host: 'acf.me.uk',
-		path: '/Public/PSO2EQ/pso2eq.txt'
-	};
-
-	callback = function(response) {
-
-	//another chunk of data has been recieved, so append it to `str`
-	response.on('data', function (chunk) {
-		str += chunk;
-	});
-
-	//the whole response has been recieved, so we just print it out here
-	response.on('end', function () {
-			findhour_EQ(str);
-			findtitle_EQ(str);
-		});
-	}
-
-	http.request(options, callback).end();
-}
-
-function findhour_EQ(str) {
-	hridx = str.indexOf('\u6642');
-	if (hridx === -1) {
-		return "-1";
-	} else {
-		hrstr = str.substring(hridx - 2, hridx);
-		return;
-	}
-}
-
-function findtitle_EQ(str) {
-	eqidx = str.indexOf('\u3010PSO2\u3011');
-	if (eqidx === -1) {
-		return "-1";
-	} else {
-		eqstr = str.substr(eqidx + 6);
-		transEQ = jsonEQ[eqstr];
-	}
 }
 
 function testArray(array, obj) {

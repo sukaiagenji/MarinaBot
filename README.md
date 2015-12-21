@@ -37,4 +37,4 @@ If you've seen my previous version of Marina, she has definitely come a long way
 
 #TODO
 
-I've still got a couple commands to work on, and I'm considering moving the PSO2 EQ Alert system into its own plugin. But that's for later. I haven't slept yet. I'll also add `git` commands for downloading Marina, and how valuable `git` is for keeping your own bot up to date!!!
+~~I've still got a couple commands to work on, and I'm considering moving the PSO2 EQ Alert system into its own plugin. But that's for later. I haven't slept yet.~~ PSO2 EQ ALERTS PLUGIN IS NOW AVAILABLE!!! :D I'll also add `git` commands for downloading Marina, and how valuable `git` is for keeping your own bot up to date!!!

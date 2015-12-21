@@ -18,6 +18,19 @@ try {
 	pingpong = {};
 }
 
+try {
+	rules = require("./rules.json");
+} catch(e) {
+	rules = {};
+}
+
+try {
+	game_abbreviations = require("./gameMap.json");
+} catch(e) {
+	game_abbreviations = {};
+	console.log("Game abbreviations not found. " + e);
+}
+
 commands = {
 	"gif": {
 		disabled: true,
@@ -44,18 +57,63 @@ commands = {
             }
         }
     },
-    "game": {
-        usage: "<name of game>",
-        description: "pings channel asking if anyone wants to play",
-        process: function(bot,msg,suffix){
-            var game = game_abbreviations[suffix];
+	"game": {
+		usage: "<name of game>",
+		description: "pings channel asking if anyone wants to play",
+		adminlvl: 1,
+		process: function(bot,msg,suffix) {
+            var game = game_abbreviations[suffix.toLowerCase()];
             if(!game) {
-                game = suffix;
+				for (var i in game_abbreviations) {
+					if (game_abbreviations[i] == suffix) {
+						game = game_abbreviations[i];
+					}
+				}
             }
-            bot.sendMessage(msg.channel, "@everyone Anyone up for " + game + "?");
-            console.log("sent game invites for " + game);
-        }
-    },
+			if (game) {
+				bot.sendMessage(msg.channel, "@everyone Anyone up for " + game + "? From " + msg.author);
+				console.log("sent game invites for " + game);
+			} else {
+				bot.sendMessage(msg.channel, msg.author + " Sorry, I don't know that game.");
+				console.log(msg.author.username + " tried to play " + suffix);
+			}
+		}
+	},
+	"savegame": {
+		usage: "<abbrev> <game title>",
+		description: "Creates a new game and abbreviation for !game",
+		adminlvl: 3,
+		process: function(bot,msg,suffix) {
+			var args = suffix.split(" ");
+			var name = args.shift().toLowerCase();
+			if(!name){
+				bot.sendMessage(msg.channel,"!savegame " + this.usage + "\n" + this.description);
+			} else {
+				var command = args.join(" ");
+				game_abbreviations[name] = command;
+				//now save the new game
+				require("fs").writeFile("./gameMap.json",JSON.stringify(game_abbreviations,null,4), null);
+				bot.sendMessage(msg.channel,"created game " + name);
+			}
+		}
+	},
+	"delgame": {
+		usage: "<name>",
+		description: "Deletes a game and abbreviation.",
+		adminlvl: 3,
+		process: function(bot,msg,suffix) {
+			var args = suffix.split(" ");
+			var name = args.shift();
+			if(!name){
+				bot.sendMessage(msg.channel,"!delgame " + this.usage + "\n" + this.description);
+			} else {
+				delete game_abbreviations[name.toLowerCase()];
+				//now save the new rules file
+				require("fs").writeFile("./gameMap.json",JSON.stringify(game_abbreviations,null,4), null);
+				bot.sendMessage(msg.channel,"deleted game " + name);
+			}
+		}
+	},
     "servers": {
         description: "lists servers bot is connected to",
 		adminlvl: 4,
@@ -109,6 +167,7 @@ commands = {
     },
     "pullanddeploy": {
 		disabled: true,
+		adminlvl: 4,
         description: "bot will perform a git pull master and restart with the new code",
         process: function(bot,msg,suffix) {
             bot.sendMessage(msg.channel,"fetching updates...",function(error,sentMsg){
@@ -240,7 +299,7 @@ commands = {
     "create": {
         usage: "<text|voice> <channel name>",
         description: "creates a channel with the given type and name.",
-		adminlvl: 3,
+		adminlvl: 4,
         process: function(bot,msg,suffix) {
             var args = suffix.split(" ");
             var type = args.shift();
@@ -260,7 +319,7 @@ commands = {
     "delete": {
         usage: "<channel name>",
         description: "deletes the specified channel",
-		adminlvl: 3,
+		adminlvl: 4,
         process: function(bot,msg,suffix) {
             var channel = bot.getChannel("name",suffix);
             bot.sendMessage(msg.channel.server.defaultChannel, "deleting channel " + suffix + " at " +msg.author + "'s request");
@@ -365,11 +424,91 @@ commands = {
 			} else if(commands[name] || name === "help"){
 				bot.sendMessage(msg.channel,"overwriting commands with other commands is not allowed!");
 			} else {
-				var command = args.shift();
-				pingpong[name] = [command, args.join(" ")];
+				var command = args.join(" ");
+				pingpong[name] = command;
 				//now save the new pingpong command
 				require("fs").writeFile("./pingpong.json",JSON.stringify(pingpong,null,4), null);
 				bot.sendMessage(msg.channel,"created command " + name);
+			}
+		}
+	},
+	"delcmd": {
+		usage: "<name>",
+		description: "Deletes a 'ping pong' command.",
+		adminlvl: 3,
+		process: function(bot,msg,suffix) {
+			var args = suffix.split(" ");
+			var name = args.shift();
+			if(!name){
+				bot.sendMessage(msg.channel,"!delcmd " + this.usage + "\n" + this.description);
+			} else if(commands[name] || name === "help"){
+				bot.sendMessage(msg.channel,"deleting reserved commands is not allowed!");
+			} else {
+				delete pingpong[name.toLowerCase()];
+				//now save the new pingpong file
+				require("fs").writeFile("./pingpong.json",JSON.stringify(pingpong,null,4), null);
+				bot.sendMessage(msg.channel,"deleted command " + name);
+			}
+		}
+	},
+	"rule": {
+		usage: "<name>",
+		description: "Prints out a 'rule' created by the admins.",
+		adminlvl: 1,
+		process: function(bot,msg,suffix) {
+			var name = suffix.toLowerCase();
+			if(!name){
+				bot.sendMessage(msg.channel,"!rule " + this.usage + "\n" + this.description);
+			} else if(commands[name] || name === "help"){
+				bot.sendMessage(msg.channel,"Standard commands aren't rules.");
+			} else {
+				var ruleTxt = rules[name];
+				if (!ruleTxt) {
+					bot.sendMessage(msg.channel, msg.author + " Sorry, I don't know that rule.");
+					console.log(msg.author.username + " tried rule " + suffix);
+				} else {
+					bot.sendMessage(msg.channel, "Internet rule " + suffix + ": " + ruleTxt);
+					console.log("sent rule " + name);
+				}
+			}
+		}
+	},
+	"saverule": {
+		usage: "<name> <actual command>",
+		description: "Creates simple 'rule' commands. Useful for keyword triggers",
+		adminlvl: 3,
+		process: function(bot,msg,suffix) {
+			var args = suffix.split(" ");
+			var name = args.shift().toLowerCase();
+			if(!name){
+				bot.sendMessage(msg.channel,"!saverule " + this.usage + "\n" + this.description);
+			} else if(commands[name] || name === "help"){
+				bot.sendMessage(msg.channel,"overwriting commands with rules is not allowed!");
+			} else {
+				var command = args.join(" ");
+				rules[name] = command;
+				//now save the new rule command
+				require("fs").writeFile("./rules.json",JSON.stringify(rules,null,4), null);
+				bot.sendMessage(msg.channel,"created rule " + name);
+			}
+		}
+	},
+	"delrule": {
+		usage: "<name>",
+		description: "Deletes a 'rule' command.",
+		adminlvl: 3,
+		process: function(bot,msg,suffix) {
+			var args = suffix.split(" ");
+			var name = args.shift();
+			if(!name){
+				bot.sendMessage(msg.channel,"!delrule " + this.usage + "\n" + this.description);
+			} else if(commands[name] || name === "help"){
+				bot.sendMessage(msg.channel,"deleting reserved commands is not allowed!");
+			} else {
+				delete rules[name.toLowerCase()];
+				//now save the new rules file
+				require("fs").writeFile("./rules.json",JSON.stringify(rules,null,4), null);
+				bot.sendMessage(msg.channel,"deleted rule " + name);
 			}
 		}
 	},

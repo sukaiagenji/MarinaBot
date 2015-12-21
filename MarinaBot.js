@@ -11,22 +11,10 @@ Special thanks to Discord and its creators Hammer & Chisel, inc.,
 
 */
 
-// Resource files for usage by MarinaBot, such as commands and PSO2es EQ translation
+// Resource files for usage by MarinaBot, such as commands
 var commands, settings, aliases, admins, pingpong;
-
-try {
-	commands = require("./commands.js");
-} catch(e) {
-	console.log("Could not load commands file (required). Terminating. " + e);
-}
-
-try {
-	aliases = require("./alias.json");
-} catch(e) {
-	//No aliases defined
-	aliases = {};
-	console.log("Aliases failed to load. " + e);
-}
+var intervals = [];
+var expCmds = [];
 
 try {
 	settings = require("./settings.json");
@@ -42,6 +30,24 @@ try {
 	var Discord = require("../");
 	console.log("Discord.JS not found. " + e);
 }
+
+// Create the bot and other server related instances
+var bot = new Discord.Client();
+
+try {
+	commands = require("./commands.js");
+} catch(e) {
+	console.log("Could not load commands file (required). Terminating. " + e);
+}
+
+try {
+	aliases = require("./alias.json");
+} catch(e) {
+	//No aliases defined
+	aliases = {};
+	console.log("Aliases failed to load. " + e);
+}
+
 
 try {
 	admins = require("./admins.json");
@@ -70,10 +76,9 @@ try {
 	  if (file.match(/\.js$/) !== null && file !== 'index.js') {
 		var name = file.replace('.js', '');
 		exports[name] = require('./plugins/' + file);
-		// If this plugin has a function named fn60sec, we'll run it every minute.
-		if (exports[name].fn60sec) {
-			setInterval(exports[name].fn60sec, 60000);
-			exports[name].fn60sec();
+		// If this plugin has a function named fn60sec, we'll add it to a stack.
+		if (exports[name][0].fn60sec) {
+			intervals.push(name);
 		}
 	  }
 	});
@@ -81,9 +86,16 @@ try {
 	console.log("No plugins found. " + e);
 }
 
+// And grab any commands from plugins as well...
+try {
+	for (var i = 0; i < intervals.length; i++) {
+		expCmds.push(exports[intervals[i]][1]);
+		}
+} catch(e) {
+	console.log(e);
+}
 
-// Create the bot and other server related instances
-var bot = new Discord.Client();
+
 
 // When the bot comes online...
 bot.on("ready", function () {
@@ -105,6 +117,21 @@ bot.on("ready", function () {
 	} catch(e) { // Or not.....
 		return;
 	}
+	
+	try {
+		// Run all the plugin intervals fn60sec functions once at start....
+		for (var i = 0; i < intervals.length; i++) {
+			exports[intervals[i]][0].fn60sec(bot);
+		}
+		// Then set the interval timer.
+		setInterval(function () { for (var i = 0; i < intervals.length; i++) {
+				exports[intervals[i]][0].fn60sec(bot);
+			}
+		}, 60000);
+	} catch(e) {
+		console.log(e);
+	}
+
 });
 
 // And when the bot goes offline for any reason.
@@ -163,7 +190,7 @@ bot.on("message", function (msg) {
 	//check if message is a command
 	if (msg.author.id != bot.user.id && msg.content[0] === '!') {
         console.log("treating " + msg.content + " from " + msg.author + " as command");
-		var cmdTxt = msg.content.split(" ")[0].substring(1);
+		var cmdTxt = msg.content.split(" ")[0].substring(1).toLowerCase().replace(/[^a-z0-9_]/gi,'');
         var suffix = msg.content.substring(cmdTxt.length+2); // Add one for the ! and one for the space
         if (msg.content.indexOf(bot.user.mention()) == 0) {
 			try {
@@ -200,17 +227,32 @@ bot.on("message", function (msg) {
 				var info = "!" + cmd;
 				bot.sendMessage(msg.channel, info + "\n\tPersonalized command made by the admins. Try it out!")
 			}
-        } else if ((cmd && (admins[msg.author.username] >= cmd.adminlvl || !cmd.adminlvl) && (cmd.disabled != true || !cmd.disabled))
-		|| pingpong[cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'')]) {
-			if (!commands[cmdTxt]) {
-				var commandName = cmdTxt.toLowerCase().replace(/[^a-z0-9_]/gi,'');
-				var commandTxt = pingpong[commandName];
+			for (var cmd in expCmds[0]) {
+				var info = "!" + cmd;
+				var usage = expCmds[0][cmd].usage;
+				if (usage) {
+					info += " " + usage;
+				}
+				var description = expCmds[0][cmd].description;
+				if(description){
+					info += "\n\t" + description;
+				}
+				bot.sendMessage(msg.channel,info);
+			}
+        } else if ((commands[cmdTxt] && (admins[msg.author.username] >= commands[cmdTxt].adminlvl || !commands[cmdTxt].adminlvl)
+			&& (commands[cmdTxt].disabled != true || !commands[cmdTxt].disabled)) || pingpong[cmdTxt] || expCmds[0][cmdTxt]) {
+			if (!commands[cmdTxt] && !expCmds[0][cmdTxt]) {
+				var commandTxt = pingpong[cmdTxt];
 				bot.sendMessage(msg.channel, commandTxt);
-			} else if (cmd.disabled != true) {
-				cmd.process(bot,msg,suffix);
+			} else if (!commands[cmdTxt] && !pingpong[cmdTxt]) {
+				expCmds[0][cmdTxt].process(bot,msg,suffix);
+			} else if (commands[cmdTxt].disabled != true) {
+				commands[cmdTxt].process(bot,msg,suffix);
 			}
 		} else {
 			bot.sendMessage(msg.channel, "Invalid command " + cmdTxt);
+			console.log(expCmds[0][cmdTxt]);
+			console.log(expCmds[0][cmdTxt].description);
 		}
 	} else {
 		//message isn't a command or is from us

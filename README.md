@@ -8,9 +8,9 @@ There are a few steps before you start using Marina for the first time. First, y
 There are 7 settings you'll need to edit in settings.json, as well as auth.json. auth.json is self-explanatory. But the others.....
 
 `discordjsLocation`<br>Simply the path to your discord.js installation. Hint: You're actually aiming for a folder.<br>
-`loginMessage`<br>Whatever you want your bot to say when it logs in, so that you know she's online!<br>
+`loginMessage`<br>Whatever you want your bot to say when it logs in, so that you know she's online! Leave blank for no login message.<br>
 `gamePlaying`<br>If you want your bot to be "playing a game", simply enter a number. See discord.js/ref/gameMap.json for valid games.<br>
-`PSO2Bot`<br>Marina was set to be a PSO2 EQ Alert Bot, so I kept this for reference.<br>
+~~`PSO2Bot`<br>Marina was set to be a PSO2 EQ Alert Bot, so I kept this for reference.~~ No longer needed!!!<br>
 `aiEnabled`<br>Marina can do AIML AI through PandoraBots!!! If you set this to true, she *must* have a botid set.<br>
 `botid`<br>Simply the bot ID of the PandoraBot that you'll be using. I'll set instructions later, or just leave it.<br>
 `aiRandomReply`<br>If you want Marina to randomly reply to guests, set this to true. She'll respond in any room!!!<br>
@@ -21,8 +21,8 @@ Be sure MarinaBot is already on your server (AKA joined) before anything else. O
 
 #Advanced
 Check out the commands.js file for things like adminlvl and command disabling. Simply.....<br>
-adminlvl can be any number, from 1 to 100. Basically, the higher a person's adminlvl, the more they can do. I only needed 5 levels, so 4 was my highest number.<br>
-Certain commands have a `disabled` variable. Setting a command's `disabled` to true removes the command from usage. Best combined with plugin removal, or if you don't need certain commands, like `!checkeq`.
+adminlvl can be any number, from 0 to 99 for a total of 100 levels. Basically, the higher a person's adminlvl, the more they can do. I only needed 5 levels, so 4 was my highest number.<br>
+Certain commands have a `disabled` variable. Setting a command's `disabled` to true removes the command from usage. ~~Best combined with plugin removal, or if you don't need certain commands, like `!checkeq`.~~ There are still some commands with "plugins", but just setting them with a `disabled` will work. My plugins, however, just need to be renamed from `*.js` to `*.somethingbesidesjs`.
 
 TODO: Explain AI setup through PandoraBots.
 

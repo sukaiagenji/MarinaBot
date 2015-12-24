@@ -5,7 +5,7 @@ MarinaBot is a Discord bot that uses discord.js. She is licensed under GPL for a
 There are a few steps before you start using Marina for the first time. First, you must install node.js onto your system. A quick internet search for your operating system will show you how to do that. Then, you'll need to get discord.js. Just run<br>`npm install discord.js`<br>and everything will be set up for you. Finally, download and extract Marina to a folder, and move on to Setting up Marina!
 
 #Setting up Marina
-There are 7 settings you'll need to edit in settings.json, as well as auth.json. auth.json is self-explanatory. But the others.....
+There are 8 settings you'll need to edit in settings.json, as well as auth.json. auth.json is self-explanatory. But the others.....
 
 `discordjsLocation`<br>Simply the path to your discord.js installation. Hint: You're actually aiming for a folder.<br>
 `botLocation`<br>Wherever the folder of your bot is. 2easy.<br>

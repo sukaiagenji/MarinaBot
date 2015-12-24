@@ -13,6 +13,7 @@ Special thanks to Discord and its creators Hammer & Chisel, inc.,
 
 // Resource files for usage by MarinaBot, such as commands
 var commands, settings, aliases, admins, pingpong;
+var expCmdsStack = {};
 var intervals = [];
 var expCmds = [];
 
@@ -50,7 +51,7 @@ try {
 
 
 try {
-	admins = require("./admins.json");
+	admins = require("./plugins/admins.json");
 } catch(e) {
 	admins = {};
 	console.log("Admin file failed to load. " + e);
@@ -76,8 +77,8 @@ try {
 	  if (file.match(/\.js$/) !== null && file !== 'index.js') {
 		var name = file.replace('.js', '');
 		exports[name] = require('./plugins/' + file);
-		// If this plugin has a function named fn60sec, we'll add it to a stack.
-		if (exports[name][0].fn60sec) {
+		// If this plugin has any functions, we'll add it to a stack.
+		if (exports[name][0]) {
 			intervals.push(name);
 		}
 	  }
@@ -90,11 +91,21 @@ try {
 try {
 	for (var i = 0; i < intervals.length; i++) {
 		expCmds.push(exports[intervals[i]][1]);
-		}
+	}
 } catch(e) {
 	console.log(e);
 }
 
+// And push the commands to one stack for later...
+try {
+	for (var i = 0; i < intervals.length; i++) {
+		for (var cmd in expCmds[i]) {
+			expCmdsStack[cmd] = 1;
+		}
+	}
+} catch(e) {
+	console.log(e);
+}
 
 
 // When the bot comes online...
@@ -115,22 +126,39 @@ bot.on("ready", function () {
 	try {
 		bot.setPlayingGame(settings.gamePlaying);
 	} catch(e) { // Or not.....
-		return;
+		console.log(e);
+		//return;
 	}
 	
 	try {
 		// Run all the plugin intervals fn60sec functions once at start....
 		for (var i = 0; i < intervals.length; i++) {
-			exports[intervals[i]][0].fn60sec(bot);
+			if (exports[intervals[i]][0].fn60sec) {
+				exports[intervals[i]][0].fn60sec(bot);
+			}
 		}
 		// Then set the interval timer.
 		setInterval(function () { for (var i = 0; i < intervals.length; i++) {
-				exports[intervals[i]][0].fn60sec(bot);
+				if (exports[intervals[i]][0].fn60sec) {
+					exports[intervals[i]][0].fn60sec(bot);
+				}
 			}
 		}, 60000);
 	} catch(e) {
 		console.log(e);
 	}
+	
+	try {
+		// And run all plugin runOnce functions.
+		for (var i = 0; i < intervals.length; i++) {
+			if (exports[intervals[i]][0].runOnce) {
+				exports[intervals[i]][0].runOnce(bot);
+			}
+		}
+	} catch(e) {
+		console.log("Nope again. " + e);
+	}
+
 
 });
 
@@ -227,32 +255,38 @@ bot.on("message", function (msg) {
 				var info = "!" + cmd;
 				bot.sendMessage(msg.channel, info + "\n\tPersonalized command made by the admins. Try it out!")
 			}
-			for (var cmd in expCmds[0]) {
-				var info = "!" + cmd;
-				var usage = expCmds[0][cmd].usage;
-				if (usage) {
-					info += " " + usage;
+			for (var i = 0; i < expCmds.length; i++) {
+				for (var cmd in expCmds[i]) {
+					var info = "!" + cmd;
+					var usage = expCmds[i][cmd].usage;
+					if (usage) {
+						info += " " + usage;
+					}
+					var description = expCmds[i][cmd].description;
+					if(description){
+						info += "\n\t" + description;
+					}
+					bot.sendMessage(msg.channel,info);
 				}
-				var description = expCmds[0][cmd].description;
-				if(description){
-					info += "\n\t" + description;
-				}
-				bot.sendMessage(msg.channel,info);
 			}
-        } else if ((commands[cmdTxt] && (admins[msg.author.username] >= commands[cmdTxt].adminlvl || !commands[cmdTxt].adminlvl)
-			&& (commands[cmdTxt].disabled != true || !commands[cmdTxt].disabled)) || pingpong[cmdTxt] || expCmds[0][cmdTxt]) {
-			if (!commands[cmdTxt] && !expCmds[0][cmdTxt]) {
+        } else if ((commands[cmdTxt] && (admins[msg.author.id] >= commands[cmdTxt].adminlvl || !commands[cmdTxt].adminlvl)
+			&& (commands[cmdTxt].disabled != true || !commands[cmdTxt].disabled)) || pingpong[cmdTxt] || expCmdsStack[cmdTxt]) {
+				
+			if (!commands[cmdTxt] && pingpong[cmdTxt]) {
 				var commandTxt = pingpong[cmdTxt];
 				bot.sendMessage(msg.channel, commandTxt);
 			} else if (!commands[cmdTxt] && !pingpong[cmdTxt]) {
-				expCmds[0][cmdTxt].process(bot,msg,suffix);
+				for (var i = 0; i < expCmds.length; i++) {
+				if (expCmds[i][cmdTxt] && ((admins[msg.author.id] >= expCmds[i][cmdTxt].adminlvl) || !expCmds[i][cmdTxt].adminlvl)) {
+						expCmds[i][cmdTxt].process(bot,msg,suffix);
+						return;
+					}
+				}
 			} else if (commands[cmdTxt].disabled != true) {
 				commands[cmdTxt].process(bot,msg,suffix);
 			}
 		} else {
 			bot.sendMessage(msg.channel, "Invalid command " + cmdTxt);
-			console.log(expCmds[0][cmdTxt]);
-			console.log(expCmds[0][cmdTxt].description);
 		}
 	} else {
 		//message isn't a command or is from us
@@ -314,6 +348,37 @@ bot.on("message", function (msg) {
 			req.end();
 		}
     }
+
+	if (msg.content.substring(0, 5).toLowerCase() === "shake" && msg.sender.username !== "CirnoBot") {
+		//send a message to the channel the ping message was sent in.
+		
+		var randomnumber = (Math.floor(Math.random() * 6) + 1);
+
+		if (randomnumber == 1) {
+			bot.sendMessage(msg.channel, "NOOOOOO!!!!! *throws " + msg.sender.username + "*");
+		} else {
+			var shakeWut = msg.content.substring(6, 11).toLowerCase();
+			//var theShaken;
+			var shakeString = "grabs and shakes ";
+			if (shakeWut === "shake") {
+				shakeString += msg.sender.username.replace(" ", '');
+				bot.sendMessage(msg.channel, "*" + shakeString + "*");
+			} else {
+				if (msg.content.substr(6).replace(/[^a-z_ ]/gi,'').trim() == "") {
+					bot.sendMessage(msg.channel, "*shakes the air*");
+					return;
+				} else {
+				shakeString += msg.content.substr(6).replace(/[^a-z_ ']/gi,'').trim();
+					bot.sendMessage(msg.channel, "*" + shakeString + "*");
+
+				}
+			}
+		}
+
+		//alert the console
+		console.log("ShakeShake-ed " + msg.sender.username);
+	}
+
 });
  
 

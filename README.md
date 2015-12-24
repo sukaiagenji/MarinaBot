@@ -8,6 +8,7 @@ There are a few steps before you start using Marina for the first time. First, y
 There are 7 settings you'll need to edit in settings.json, as well as auth.json. auth.json is self-explanatory. But the others.....
 
 `discordjsLocation`<br>Simply the path to your discord.js installation. Hint: You're actually aiming for a folder.<br>
+`botLocation`<br>Wherever the folder of your bot is. 2easy.<br>
 `loginMessage`<br>Whatever you want your bot to say when it logs in, so that you know she's online! Leave blank for no login message.<br>
 `gamePlaying`<br>If you want your bot to be "playing a game", simply enter a number. See discord.js/ref/gameMap.json for valid games.<br>
 ~~`PSO2Bot`<br>Marina was set to be a PSO2 EQ Alert Bot, so I kept this for reference.~~ No longer needed!!!<br>
@@ -27,7 +28,7 @@ Certain commands have a `disabled` variable. Setting a command's `disabled` to t
 TODO: Explain AI setup through PandoraBots.
 
 #PSO2 EQ Alerts Status
-As of now, MarinaBot will auto-alert for any PSO2 EQs, but won't do her other commands, such as `!checkeq`, `!previouseq`, or `!currenteq`. I also hope to include a calendar function for scheduled EQs, but that may be a little much for MarinaBot right now.
+As of now, MarinaBot will auto-alert for any PSO2 EQs and `!checkeq`, but won't do her other 2 commands `!previouseq`, or `!currenteq`. I also hope to include a calendar function for scheduled EQs, but that may be a little much for MarinaBot right now.
 
 #Marina's Future
 There's a LOT of functionality that I'm leaving out right now, such as the Google Image plugin, Wikipedia plugin, and others. I hope to add a few more items to settings.json and include the plugins, with an ability to disable them. ~~I'll also be adding back the ability to add commands on the fly, including full functionality. If you look at the commands.js file, you'll see what I mean.~~ SIMPLE PINGPONG COMMAND ADDITION FUNCTIONS ADDED BACK!!! ~~I also intend to add admin and superuser files so that only certain people can run certain commands. As of now, so long as MarinaBot has the ability, anyone, and I mean ANYONE, can add or delete a channel. Not good.~~ FIXED!!! Expect more fun things tomorrow!!!

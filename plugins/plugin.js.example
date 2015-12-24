@@ -1,0 +1,55 @@
+//Add any globally accessible vars here. These are only accessible from this file!!!
+
+//Example to grab the settings file into var settings.
+var settings;
+
+try {
+	settings = require("../settings.json");
+} catch(e) {
+	//No settings file found. Terminating.
+	console.log("Settings failed to load. " + e);
+}
+
+// Internal functions are available to the plugin, but not to Marina.
+// This is an example internal function.
+
+function myFunction() {
+	// Do something, like...
+	console.log("Hello world!");
+}
+
+// expFuncs are any functions you want exported to MarinaBot.
+expFuncs = {
+	"fn60sec" : function (bot,msg,suffix) {
+		// This function will run once at startup, then once every 60 seconds.
+		// Just make it do something, or delete it altogether.
+		console.log("Timer started/working.");
+	},
+	"runOnce" : function (bot,msg,suffix) {
+		// This function will just run once at startup, and only again
+		// if called. Again, make it do something, or delete.
+		console.log("plugin has started successfully!");
+	}
+}
+
+// expCmds are any commands you want your bot to be able to do.
+
+expCmds = {
+	// Sample command. Includes command name, usage, disabled, description, adminlvl, and the process.
+	// command name, description, and process are REQUIRED.
+    "hello": {
+        usage: "<ignore me>",
+		disabled: true,
+        description: "logs messages to bot console",
+		adminlvl: 4,
+        process: function(bot,msg,suffix) {
+			console.log(msg.content);
+			// If you want to call an exported function...
+			expFuncs.runOnce();
+			// or an internal function...
+			myFunction();
+		}
+    }
+}
+
+module.exports = [ expFuncs, expCmds ];

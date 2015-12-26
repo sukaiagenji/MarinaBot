@@ -1,0 +1,41 @@
+{
+  "name": "MarinaBot",
+  "description": "MarinaBot is a Discord Bot",
+  "version": "2.0a",
+  "keywords": [
+    "discord",
+    "discord.js",
+    "marina",
+    "bot",
+    "marinabot",
+    "ai",
+    "artificial intelligence",
+    "chatbot"
+  ],
+  "maintainers": [
+    {
+      "name": "Sukaia Genji",
+      "email": "sukaiagenji@gmail.com",
+      "web": ""
+    }
+  ],
+  "dependencies": {
+    "discord.js": "<=5.2.x"
+  },
+  "bugs": {
+    "web": "https://github.com/sukaiagenji/MarinaBot/issues"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/sukaiagenji/MarinaBot.git"
+    }
+  ],
+  "licenses": [
+    {
+      "name": "GPL",
+      "url": ""
+    }
+  ],
+  "homepage": "https://github.com/sukaiagenji/MarinaBot"
+}

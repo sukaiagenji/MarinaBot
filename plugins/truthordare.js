@@ -29,17 +29,7 @@ function doRNG(maxRNG) {
 	return rngRandom;
 }
 
-expFuncs = {
-	"runOnce" : function () {
-	for (var item in truth) {
-		truthTotal++;
-	}
-	for (var item in dare) {
-		dareTotal++;
-	}
-
-	}
-}
+expFuncs = {}
 
 expCmds = {
     "truth": {

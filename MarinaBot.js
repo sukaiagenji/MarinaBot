@@ -218,7 +218,7 @@ bot.on("message", function (msg) {
 	//check if message is a command
 	if (msg.author.id != bot.user.id && msg.content[0] === '!') {
         console.log("treating " + msg.content + " from " + msg.author + " as command");
-		var cmdTxt = msg.content.split(" ")[0].substring(1).toLowerCase().replace(/[^a-z0-9_]/gi,'');
+		var cmdTxt = msg.content.split(" ")[0].substring(1).toLowerCase().replace(/[^a-z0-9_!]/gi,'');
         var suffix = msg.content.substring(cmdTxt.length+2); // Add one for the ! and one for the space
         if (msg.content.indexOf(bot.user.mention()) == 0) {
 			try {
@@ -237,7 +237,7 @@ bot.on("message", function (msg) {
         if (cmdTxt === "help") {
             //help is special since it iterates over the other commands
             for (var cmd in commands) {
-				if ((!commands[cmd].adminlvl || admins[msg.author.id] >= commands[cmd].adminlvl) && commands[cmd].disabled != true) {
+				if ((!commands[cmd].adminlvl || admins[msg.author.id] >= commands[cmd].adminlvl) && commands[cmd].disabled != true && commands[cmd].hidden != true) {
 					var info = "!" + cmd;
 					var usage = commands[cmd].usage;
 					if (usage) {
@@ -256,7 +256,7 @@ bot.on("message", function (msg) {
 			}
 			for (var i = 0; i < expCmds.length; i++) {
 				for (var cmd in expCmds[i]) {
-					if ((!expCmds[i][cmd].adminlvl || admins[msg.author.id] >= expCmds[i][cmd].adminlvl) && expCmds[i][cmd].disabled != true) {
+					if ((!expCmds[i][cmd].adminlvl || admins[msg.author.id] >= expCmds[i][cmd].adminlvl) && expCmds[i][cmd].disabled != true && expCmds[i][cmd].hidden != true) {
 						var info = "!" + cmd;
 						var usage = expCmds[i][cmd].usage;
 						if (usage) {

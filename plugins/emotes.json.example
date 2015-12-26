@@ -1,0 +1,35 @@
+{
+	"barf": {
+		"1": " barfs on the floor",
+		"2": " barfs on ",
+		"3": "'s shoes"
+	},
+	"dance": {
+		"1": " dances around",
+		"2": " dances with ",
+		"3": ""
+	},
+	"kick": {
+		"1": " kicks at the dirt",
+		"2": " kicks ",
+		"3": " in the shin"
+	},
+	"dropkick": {
+		"1": " dropkicks from heights unknown",
+		"2": " dropkicks ",
+		"3": ""
+	},
+	"scream": {
+		"1": " screams as loud as possible",
+		"2": " screams at ",
+		"3": ""
+	},
+	"burp": {
+		"1": " burps",
+		"2": " burps loudly next to ",
+		"3": ""
+	},
+	"fart": {
+		"1": ", WHERE ARE YOUR MANNERS??? D:"
+	}
+}

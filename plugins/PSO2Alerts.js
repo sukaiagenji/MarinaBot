@@ -7,7 +7,7 @@ try {
 	console.log("Couldn't load EQ Translation file, needed for PSO2 EQ Bot. " + e)
 }
 
-var oldTxt, eqTxt, eqstr, hrstr;
+var oldTxt, eqTxt, eqstr, hrstr, stringPrint;
 
 expFuncs = {
 	"fn60sec" : function (bot) {
@@ -48,6 +48,7 @@ function getNotice() {
 		//the whole response has been recieved, so we just print it out here
 		response.on('end', function () {
 				findhour_EQ(eqTxt);
+				findmin_EQ(eqTxt);
 				findtitle_EQ(eqTxt);
 			});
 		}
@@ -63,6 +64,15 @@ function findhour_EQ(eqTxt) {
 			hrstr = eqTxt.substring(hridx - 2, hridx);
 		}
 	}
+	
+function findmin_EQ(str) {
+		mnidx = str.indexOf('\u5206');
+		if (mnidx === -1) {
+			return "-1";
+		}
+		mnstr = str.substring(mnidx - 2, mnidx);
+		return;
+	}
 
 function findtitle_EQ(eqTxt) {
 		var eqidx = eqTxt.indexOf('\u3010PSO2\u3011');
@@ -73,6 +83,26 @@ function findtitle_EQ(eqTxt) {
 		}
 	}
 
+function prevTime(cOrP) {
+		var d = new Date();
+		hrnow = d.getHours();
+		
+		if (hrstr == hrnow && cOrP === "current") {
+			stringPrint = "Current EQ Report from PSO2es: " + jsonEQ[eqstr] + " (JP: " + eqstr + "@" + hrstr + ":" + mnstr + " JST)";
+		}
+		if (hrstr == hrnow + 1 && cOrP === "current") {
+			stringPrint = "Try !checkeq. You might like it. :3";
+		}
+		if (hrstr > hrnow && cOrP === "previous") {
+			stringPrint = "No previous EQ Report. Have you tried !currenteq?";
+		}
+		if (hrstr < hrnow && cOrP === "current") {
+			stringPrint = "No current EQ Report. Have you tried !previouseq?";
+		}
+		if (hrstr < hrnow && cOrP === "previous") {
+			stringPrint = "Previous EQ Report from PSO2es: " + jsonEQ[eqstr] + " (JP: " + eqstr + "@" + hrstr + ":" + mnstr + " JST)";
+		}
+	}
 
 expCmds = {
 	"checkeq": {
@@ -83,10 +113,26 @@ expCmds = {
 			var hrnow = d.getHours();
 			
 			if (hrstr == hrnow + 1) {
-				bot.sendMessage(msg.channel, msg.author + " Incoming EQ Report from PSO2es: " + jsonEQ[eqstr] + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");
+				bot.sendMessage(msg.channel, msg.author + " Incoming EQ Report from PSO2es: " + jsonEQ[eqstr] + "\n(JP: " + eqstr + "@" + hrstr + ":" + mnstr + " JST)");
 			} else {
 				bot.sendMessage(msg.channel, msg.author + " No new EQ Report from PSO2es.");
 			}
+		}
+	},
+	"currenteq": {
+		description: "Responds with the current EQ for this hour, if there is one.",
+		process: function(bot,msg) {
+			getNotice();
+			prevTime("current");
+			bot.sendMessage(msg.channel, stringPrint);
+		}
+	},
+	"previouseq": {
+		description: "Responds with the most recent previous EQ.",
+		process: function(bot,msg) {
+			getNotice();
+			prevTime("previous");
+			bot.sendMessage(msg.channel, stringPrint);
 		}
 	}
 }

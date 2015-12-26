@@ -234,11 +234,10 @@ bot.on("message", function (msg) {
 			cmdTxt = alias[0];
 			suffix = alias[1] + " " + suffix;
 		}
-		var cmd = commands[cmdTxt];
         if (cmdTxt === "help") {
             //help is special since it iterates over the other commands
             for (var cmd in commands) {
-				if ((!commands[cmd].adminlvl || commands[cmd].adminlvl <= admins[msg.author.username]) && commands[cmd].disabled != true) {
+				if ((!commands[cmd].adminlvl || admins[msg.author.id] >= commands[cmd].adminlvl) && commands[cmd].disabled != true) {
 					var info = "!" + cmd;
 					var usage = commands[cmd].usage;
 					if (usage) {
@@ -257,16 +256,19 @@ bot.on("message", function (msg) {
 			}
 			for (var i = 0; i < expCmds.length; i++) {
 				for (var cmd in expCmds[i]) {
-					var info = "!" + cmd;
-					var usage = expCmds[i][cmd].usage;
-					if (usage) {
-						info += " " + usage;
+					if ((!expCmds[i][cmd].adminlvl || admins[msg.author.id] >= expCmds[i][cmd].adminlvl) && expCmds[i][cmd].disabled != true) {
+						var info = "!" + cmd;
+						var usage = expCmds[i][cmd].usage;
+						if (usage) {
+							info += " " + usage;
+						}
+						var description = expCmds[i][cmd].description;
+						if(description){
+							info += "\n\t" + description;
+						}
+						bot.sendMessage(msg.channel,info);
+						
 					}
-					var description = expCmds[i][cmd].description;
-					if(description){
-						info += "\n\t" + description;
-					}
-					bot.sendMessage(msg.channel,info);
 				}
 			}
         } else if ((commands[cmdTxt] && (admins[msg.author.id] >= commands[cmdTxt].adminlvl || !commands[cmdTxt].adminlvl)

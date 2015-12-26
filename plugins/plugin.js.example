@@ -38,7 +38,7 @@ expCmds = {
 	// Sample command. Includes command name, usage, disabled, description, adminlvl, and the process.
 	// command name, description, and process are REQUIRED.
     "hello": {
-        usage: "<ignore me>",
+        usage: "<some message>",
 		disabled: true,
         description: "logs messages to bot console",
 		adminlvl: 4,

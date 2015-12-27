@@ -95,7 +95,7 @@ function prevTime(cOrP) {
 		if (hrstr == hrnow + 1 && cOrP === "current") {
 			stringPrint = "Try !checkeq. You might like it. :3";
 		}
-		if (hrstr > hrnow && cOrP === "previous") {
+		if (hrstr >= hrnow && cOrP === "previous") {
 			stringPrint = "No previous EQ Report. Have you tried !currenteq?";
 		}
 		if (hrstr < hrnow && cOrP === "current") {

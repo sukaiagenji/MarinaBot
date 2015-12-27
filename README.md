@@ -1,4 +1,9 @@
+# Discord is down???
+
+Well, it seems Discord went down around 8amEST this morning. At least, for me. I'm not sure if anyone will remember this GitHub is here, but I'll be on PSO2 when I get up later, and I'll hope Discord is back up. I'll see everyone later!!!
+
 # MarinaBot
+
 MarinaBot is a Discord bot that uses discord.js. She is licensed under GPL for any and all usage, just be sure to include me and other contributors in any edits made, as I have.
 
 #Installation

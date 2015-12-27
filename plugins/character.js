@@ -165,6 +165,7 @@ expCmds = {
 	"!": {
 		description: " ",
 		adminlvl: 2,
+		hidden: true,
 		process: function(bot,msg,suffix) {
 			var answer = suffix.toLowerCase().replace(/[^a-z]/gi,'');
 			switch(currentAt[msg.author.id]) {

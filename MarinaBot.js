@@ -271,13 +271,13 @@ bot.on("message", function (msg) {
 					}
 				}
 			}
-        } else if ((commands[cmdTxt] && (admins[msg.author.id] >= commands[cmdTxt].adminlvl || !commands[cmdTxt].adminlvl)
-			&& (commands[cmdTxt].disabled != true || !commands[cmdTxt].disabled)) || pingpong[cmdTxt] || expCmdsStack[cmdTxt]) {
+        } else if ((commands[cmdTxt] && (admins[msg.author.id] >= commands[cmdTxt.replace(/[^a-z0-9_]/gi,'')].adminlvl || !commands[cmdTxt.replace(/[^a-z0-9_]/gi,'')].adminlvl)
+			&& (commands[cmdTxt.replace(/[^a-z0-9_]/gi,'')].disabled != true || !commands[cmdTxt.replace(/[^a-z0-9_]/gi,'')].disabled)) || pingpong[cmdTxt.replace(/[^a-z0-9_]/gi,'')] || expCmdsStack[cmdTxt]) {
 				
-			if (!commands[cmdTxt] && pingpong[cmdTxt]) {
-				var commandTxt = pingpong[cmdTxt];
+			if (!commands[cmdTxt.replace(/[^a-z0-9_]/gi,'')] && pingpong[cmdTxt.replace(/[^a-z0-9_]/gi,'')]) {
+				var commandTxt = pingpong[cmdTxt.replace(/[^a-z0-9_]/gi,'')];
 				bot.sendMessage(msg.channel, commandTxt);
-			} else if (!commands[cmdTxt] && !pingpong[cmdTxt]) {
+			} else if (!commands[cmdTxt.replace(/[^a-z0-9_]/gi,'')] && !pingpong[cmdTxt.replace(/[^a-z0-9_]/gi,'')]) {
 				for (var i = 0; i < expCmds.length; i++) {
 				if (expCmds[i][cmdTxt] && ((admins[msg.author.id] >= expCmds[i][cmdTxt].adminlvl) || !expCmds[i][cmdTxt].adminlvl)) {
 						expCmds[i][cmdTxt].process(bot,msg,suffix);
@@ -285,7 +285,7 @@ bot.on("message", function (msg) {
 					}
 				}
 			} else if (commands[cmdTxt].disabled != true) {
-				commands[cmdTxt].process(bot,msg,suffix);
+				commands[cmdTxt.replace(/[^a-z0-9_]/gi,'')].process(bot,msg,suffix);
 			}
 		} else {
 			bot.sendMessage(msg.channel, "Invalid command " + cmdTxt);

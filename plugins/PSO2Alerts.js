@@ -12,12 +12,14 @@ var oldTxt, eqTxt, eqstr, hrstr, stringPrint;
 expFuncs = {
 	"fn60sec" : function (bot) {
 		getNotice();
+		var d = new Date();
+		hrnow = d.getHours();
 		setTimeout(function() {
 		if (!oldTxt && eqTxt !== '') {
 			oldTxt = eqTxt;
 			return;
 		} else {
-			if (oldTxt !== eqTxt) {
+			if (oldTxt !== eqTxt && (hrstr = hrnow + 1)) {
 				for (var i = 0; i < bot.channels.length; i++) {
 					if (bot.channels[i].name == "general") {
 						bot.sendMessage(bot.channels[i].id, "@everyone Incoming EQ Report from PSO2es: " + jsonEQ[eqstr] + "\n(JP: " + eqstr + "@" + hrstr + ":00 JST)");

@@ -36,8 +36,8 @@ function getNotice() {
 		eqTxt = '';
 		var http = require('http');
 		var options = {
-			host: 'acf.me.uk',
-			path: '/Public/PSO2EQ/pso2eq.txt'
+			host: 'pso2.acf.me.uk',
+			path: '/pso2eq.txt'
 		};
 
 		callback = function(response) {
